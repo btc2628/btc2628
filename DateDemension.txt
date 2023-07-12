@@ -1,0 +1,59 @@
+CREATE TABLE DateDimension (
+    DateValue DATE PRIMARY KEY,
+    Year INT NOT NULL,
+    FiscalYear INT NOT NULL,
+    Quarter INT NOT NULL,
+    FiscalQuarter INT NOT NULL,
+    Month INT NOT NULL,
+    MonthName NVARCHAR(15) NOT NULL,
+    Day INT NOT NULL,
+    DayOfWeek NVARCHAR(15) NOT NULL,
+    DayOfYear INT NOT NULL,
+    WeekOfYear INT NOT NULL,
+    IsWeekend BIT NOT NULL
+);
+
+DECLARE @StartDate DATE = '2000-01-01';
+DECLARE @EndDate DATE = '2030-12-31';
+
+WHILE @StartDate <= @EndDate
+BEGIN
+    INSERT INTO DateDimension (
+        DateValue,
+        Year,
+        FiscalYear,
+        Quarter,
+        FiscalQuarter,
+        Month,
+        MonthName,
+        Day,
+        DayOfWeek,
+        DayOfYear,
+        WeekOfYear,
+        IsWeekend
+    )
+    VALUES (
+        @StartDate,
+        YEAR(@StartDate),
+        CASE
+            WHEN MONTH(@StartDate) < 10 THEN YEAR(@StartDate)
+            ELSE YEAR(@StartDate) + 1
+        END,
+        DATEPART(QUARTER, @StartDate),
+        CASE 
+            WHEN MONTH(@StartDate) BETWEEN 10 AND 12 OR MONTH(@StartDate) BETWEEN 1 AND 3 THEN 1 
+            WHEN MONTH(@StartDate) BETWEEN 4 AND 6 THEN 2 
+            WHEN MONTH(@StartDate) BETWEEN 7 AND 9 THEN 3
+            ELSE 4
+        END,
+        MONTH(@StartDate),
+        DATENAME(MONTH, @StartDate),
+        DAY(@StartDate),
+        DATENAME(WEEKDAY, @StartDate),
+        DAYOFYEAR(@StartDate),
+        DATEPART(wk, @StartDate),
+        CASE WHEN DATEPART(dw, @StartDate) IN (1, 7) THEN 1 ELSE 0 END
+    );
+
+    SET @StartDate = DATEADD(DAY, 1, @StartDate);
+END;
