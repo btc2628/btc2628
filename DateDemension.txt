@@ -1,11 +1,9 @@
-CREATE TABLE DateDimension (
+CREATE TABLE #DateDimension (
     DateKey INT NOT NULL PRIMARY KEY,
     DateValue DATE NOT NULL,
     DateFullName NVARCHAR(20) NOT NULL,
     Year INT NOT NULL,
-    FiscalYear INT NOT NULL,
     Quarter INT NOT NULL,
-    FiscalQuarter INT NOT NULL,
     Month INT NOT NULL,
     MonthName NVARCHAR(15) NOT NULL,
     Day INT NOT NULL,
@@ -14,19 +12,17 @@ CREATE TABLE DateDimension (
     IsWeekend BIT NOT NULL
 );
 
-DECLARE @StartDate DATE = '2000-01-01';
-DECLARE @EndDate DATE = '2030-12-31';
+DECLARE @StartDate DATE = '2015-01-01';
+DECLARE @EndDate DATE = '2100-12-31';
 
 WHILE @StartDate <= @EndDate
 BEGIN
-    INSERT INTO DateDimension (
+    INSERT INTO #DateDimension (
         DateKey,
         DateValue,
         DateFullName,
         Year,
-        FiscalYear,
         Quarter,
-        FiscalQuarter,
         Month,
         MonthName,
         Day,
@@ -39,17 +35,7 @@ BEGIN
         @StartDate,
         CAST(DAY(@StartDate) AS NVARCHAR(2)) + ' ' + DATENAME(MONTH, @StartDate) + ' ' + CAST(YEAR(@StartDate) AS NVARCHAR(4)),
         YEAR(@StartDate),
-        CASE
-            WHEN MONTH(@StartDate) < 10 THEN YEAR(@StartDate)
-            ELSE YEAR(@StartDate) + 1
-        END,
         DATEPART(QUARTER, @StartDate),
-        CASE 
-            WHEN MONTH(@StartDate) BETWEEN 10 AND 12 OR MONTH(@StartDate) BETWEEN 1 AND 3 THEN 1 
-            WHEN MONTH(@StartDate) BETWEEN 4 AND 6 THEN 2 
-            WHEN MONTH(@StartDate) BETWEEN 7 AND 9 THEN 3
-            ELSE 4
-        END,
         MONTH(@StartDate),
         DATENAME(MONTH, @StartDate),
         DAY(@StartDate),
