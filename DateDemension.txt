@@ -1,6 +1,7 @@
 CREATE TABLE DateDimension (
     DateKey INT NOT NULL PRIMARY KEY,
     DateValue DATE NOT NULL,
+    DateFullName NVARCHAR(20) NOT NULL,
     Year INT NOT NULL,
     FiscalYear INT NOT NULL,
     Quarter INT NOT NULL,
@@ -22,6 +23,7 @@ BEGIN
     INSERT INTO DateDimension (
         DateKey,
         DateValue,
+        DateFullName,
         Year,
         FiscalYear,
         Quarter,
@@ -37,6 +39,7 @@ BEGIN
     VALUES (
         CAST(CONVERT(VARCHAR(8), @StartDate, 112) AS INT),
         @StartDate,
+        CAST(DAY(@StartDate) AS NVARCHAR(2)) + ' ' + DATENAME(MONTH, @StartDate) + ' ' + CAST(YEAR(@StartDate) AS NVARCHAR(4)),
         YEAR(@StartDate),
         CASE
             WHEN MONTH(@StartDate) < 10 THEN YEAR(@StartDate)
