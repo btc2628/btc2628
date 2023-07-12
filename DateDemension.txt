@@ -10,7 +10,6 @@ CREATE TABLE DateDimension (
     MonthName NVARCHAR(15) NOT NULL,
     Day INT NOT NULL,
     DayOfWeek NVARCHAR(15) NOT NULL,
-    DayOfYear INT NOT NULL,
     WeekOfYear INT NOT NULL,
     IsWeekend BIT NOT NULL
 );
@@ -32,7 +31,6 @@ BEGIN
         MonthName,
         Day,
         DayOfWeek,
-        DayOfYear,
         WeekOfYear,
         IsWeekend
     )
@@ -56,7 +54,6 @@ BEGIN
         DATENAME(MONTH, @StartDate),
         DAY(@StartDate),
         DATENAME(WEEKDAY, @StartDate),
-        DAYOFYEAR(@StartDate),
         DATEPART(wk, @StartDate),
         CASE WHEN DATEPART(dw, @StartDate) IN (1, 7) THEN 1 ELSE 0 END
     );
