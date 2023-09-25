@@ -1,0 +1,24 @@
+import pyautogui
+import random
+import time
+
+# Get the screen width and height
+screen_width, screen_height = pyautogui.size()
+
+# Define the duration of mouse movement
+movement_duration = 2  # in seconds
+
+try:
+    while True:
+        # Generate random coordinates within the screen boundaries
+        x = random.randint(0, screen_width)
+        y = random.randint(0, screen_height)
+
+        # Move the mouse to the random coordinates
+        pyautogui.moveTo(x, y, duration=movement_duration)
+
+        # Pause for a while before the next movement
+        time.sleep(movement_duration)
+
+except KeyboardInterrupt:
+    print("Mouse movement simulation stopped.")
