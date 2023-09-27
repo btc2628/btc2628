@@ -1,41 +1,44 @@
-WITH 
-DateConverted AS (
-    SELECT 
-        Name,
-        id,
-        number,
-        EXTRACT(YEAR FROM Month) * 100 + EXTRACT(MONTH FROM Month) AS YearMonth
-    FROM 
-        original_table
-),
-RankedData AS (
-    SELECT 
-        Name,
-        id,
-        number,
-        YearMonth,
-        ROW_NUMBER() OVER (PARTITION BY Name, id, number ORDER BY YearMonth) as row_num
-    FROM 
-        DateConverted
-),
-GroupedData AS (
-    SELECT 
-        Name,
-        id,
-        number,
-        YearMonth,
-        YearMonth - row_num as group_num
-    FROM 
-        RankedData
-)
+-- 1. Convert to Continuous Month
+SELECT 
+    Name,
+    id,
+    number,
+    (YEAR(Month) - 2000) * 12 + MONTH(Month) AS cont_month
+INTO #ContinuousMonthData
+FROM 
+    original_table;
+
+-- 2. Assign a Row Number
+SELECT 
+    Name,
+    id,
+    number,
+    cont_month,
+    ROW_NUMBER() OVER (PARTITION BY Name, id, number ORDER BY cont_month) as row_num
+INTO #RankedData
+FROM 
+    #ContinuousMonthData;
+
+-- 3. Calculate Group
+SELECT 
+    Name,
+    id,
+    number,
+    cont_month,
+    cont_month - row_num as group_num
+INTO #GroupedData
+FROM 
+    #RankedData;
+
+-- 4. Aggregate Data and Convert back to Date
 SELECT
     Name,
     id,
     number,
-    MIN(YearMonth) as startMonth,
-    MAX(YearMonth) as endMonth
+    DATEADD(MONTH, MIN(cont_month) - 1, '2000-01-01') as startMonth,
+    DATEADD(MONTH, MAX(cont_month) - 1, '2000-01-01') as endMonth
 FROM 
-    GroupedData
+    #GroupedData
 GROUP BY
     Name,
     id,
@@ -46,3 +49,8 @@ ORDER BY
     id,
     number,
     startMonth;
+
+-- 5. Cleanup
+DROP TABLE #ContinuousMonthData;
+DROP TABLE #RankedData;
+DROP TABLE #GroupedData;
