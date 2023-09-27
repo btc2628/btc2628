@@ -1,20 +1,30 @@
-WITH RankedData AS (
+WITH 
+DateConverted AS (
     SELECT 
         Name,
         id,
         number,
-        Month,
-        ROW_NUMBER() OVER (PARTITION BY Name, id, number ORDER BY Month) as row_num
+        EXTRACT(YEAR FROM Month) * 100 + EXTRACT(MONTH FROM Month) AS YearMonth
     FROM 
         original_table
+),
+RankedData AS (
+    SELECT 
+        Name,
+        id,
+        number,
+        YearMonth,
+        ROW_NUMBER() OVER (PARTITION BY Name, id, number ORDER BY YearMonth) as row_num
+    FROM 
+        DateConverted
 ),
 GroupedData AS (
     SELECT 
         Name,
         id,
         number,
-        Month,
-        Month - row_num as group_num
+        YearMonth,
+        YearMonth - row_num as group_num
     FROM 
         RankedData
 )
@@ -22,8 +32,8 @@ SELECT
     Name,
     id,
     number,
-    MIN(Month) as startMonth,
-    MAX(Month) as endMonth
+    MIN(YearMonth) as startMonth,
+    MAX(YearMonth) as endMonth
 FROM 
     GroupedData
 GROUP BY
