@@ -1,0 +1,60 @@
+WITH condensed AS (
+SELECT [Branch]
+      --,[EID]
+      ,[AssignedPerCnt]
+      ,[ERM] as ERM
+      --,[Banker]
+      ,MIN(Month) as StartDate
+	  ,Max(Month) as EndDate
+  FROM [BB_Sales_Support].[dbo].[RM_Branch_ASSIGN]
+  where Month is not Null
+  and ERM is not null
+  --and EID is not Null
+  and Branch is not Null
+  Group By Branch, AssignedPerCnt, ERM),
+--Step 2: For each Branch order employees by most recent to least recent
+  MAXDATEROW as(
+  SELECT [Branch]
+      --,[EID]
+      ,[AssignedPerCnt]
+      ,[ERM]
+      --,[Banker]
+      ,[StartDate]
+	  ,[EndDate]
+	  ,ROW_NUMBER() OVER (PARTITION BY Branch Order By EndDate DESC) as rn
+  FROM condensed
+  )
+--Step 3: When employee is most recent employee, set them as having EndDate of null
+INSERT INTO	relationship_manager_branch_assign(
+	Branch,
+    EID,
+    AssignedPerCnt,
+    ERM,
+    Banker,
+    StartDate,
+	EndDate
+)
+  SELECT DISTINCT 
+  rm.Branch
+	  ,bg.EID
+      --,rm.EID
+      ,rm.AssignedPerCnt
+      ,rm.ERM
+	  ,ud.last_name + ', ' + ud.first_name as Banker
+	  --,wp.Worker_Name_Last + ', ' + wp.Worker_Name_First as BankerWDP
+      --,rm.Banker
+	  ,md.StartDate
+	  ,CASE WHEN (md.rn = 1 and rh.closed = 0) THEN NULL ELSE EOMONTH(md.EndDate) END as EndDate
+  from [BB_Sales_Support].[dbo].[RM_Branch_ASSIGN] rm
+  Inner Join MAXDATEROW md
+  On rm.Branch = md.Branch 
+  --AND rm.EID = md.EID
+  AND rm.ERM = md.ERM
+  Left Join CDWRPTPROD.erm.dbo.user_role ur
+  on rm.ERM = ur.user_role_id
+  Left Join CDWRPTPROD.erm.dbo.user_detail ud
+  on ur.user_id = UD.user_id
+  Left Join BB_Sales_Support.dbo.CY_Banker_Goals bg
+  on rm.ERM = bg.Rep_No
+  Left Join [YOGINI].[basedata].[dbo].[ret_hierarchy] rh
+  on CAST(rh.branch_no as int) = rm.branch
