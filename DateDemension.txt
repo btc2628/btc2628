@@ -1,48 +1,100 @@
-CREATE TABLE #DateDimension (
-    DateKey INT NOT NULL PRIMARY KEY,
-    DateValue DATE NOT NULL,
-    DateFullName NVARCHAR(20) NOT NULL,
-    Year INT NOT NULL,
-    Quarter INT NOT NULL,
-    Month INT NOT NULL,
-    MonthName NVARCHAR(15) NOT NULL,
-    Day INT NOT NULL,
-    DayOfWeek NVARCHAR(15) NOT NULL,
-    WeekOfYear INT NOT NULL,
-    IsWeekend BIT NOT NULL
-);
-
-DECLARE @StartDate DATE = '2015-01-01';
-DECLARE @EndDate DATE = '2100-12-31';
-
-WHILE @StartDate <= @EndDate
-BEGIN
-    INSERT INTO #DateDimension (
-        DateKey,
-        DateValue,
-        DateFullName,
-        Year,
-        Quarter,
-        Month,
-        MonthName,
-        Day,
-        DayOfWeek,
-        WeekOfYear,
-        IsWeekend
-    )
-    VALUES (
-        CAST(CONVERT(VARCHAR(8), @StartDate, 112) AS INT),
-        @StartDate,
-        CAST(DAY(@StartDate) AS NVARCHAR(2)) + ' ' + DATENAME(MONTH, @StartDate) + ' ' + CAST(YEAR(@StartDate) AS NVARCHAR(4)),
-        YEAR(@StartDate),
-        DATEPART(QUARTER, @StartDate),
-        MONTH(@StartDate),
-        DATENAME(MONTH, @StartDate),
-        DAY(@StartDate),
-        DATENAME(WEEKDAY, @StartDate),
-        DATEPART(wk, @StartDate),
-        CASE WHEN DATEPART(dw, @StartDate) IN (1, 7) THEN 1 ELSE 0 END
-    );
-
-    SET @StartDate = DATEADD(DAY, 1, @StartDate);
-END;
+AcctSystem	char(4)	Unchecked
+Bank	int	Unchecked
+AccountNumber	char(25)	Unchecked
+CustomerNumber	char(10)	Checked
+BookBalance	money	Checked
+UnusedBalance	money	Checked
+CommitmentBalance	money	Checked
+CurrentBalance	money	Checked
+AvailableBalance	money	Checked
+UserBalance	money	Checked
+PurposeCode	char(4)	Checked
+TakendownAmt	money	Checked
+OccupancyCode	char(1)	Checked
+REG_UZ	char(5)	Checked
+CustomerType	smallint	Checked
+CustomerTypeDesc	char(50)	Checked
+ObligationType	char(3)	Checked
+RateIndexCode	char(5)	Checked
+IndLiabilityAmt	money	Checked
+InterestRate	numeric(9, 5)	Checked
+CloseFlag	char(1)	Checked
+AssignUnit	char(5)	Checked
+EffectiveDate	datetime	Checked
+MaturityDate	datetime	Checked
+OriginalBalance	money	Checked
+Tier1Tier2Indicator	char(1)	Checked
+LastActivityDate	datetime	Checked
+AvgBalMTD	money	Checked
+CommitmentFee	money	Checked
+UnusedLineFee	money	Checked
+NumTakedowns	smallint	Checked
+ProcessType	char(4)	Checked
+BlockedLCAmt	money	Checked
+NumLettersOfCredit	smallint	Checked
+Margin	numeric(9, 5)	Checked
+CostOfFunds	char(15)	Checked
+Amortization	numeric(9, 5)	Checked
+AmortType	char(1)	Checked
+ServiceUnit	char(5)	Checked
+PDGradeObligation	tinyint	Checked
+NonAFSAccount	char(15)	Checked
+ParticipationType	char(3)	Checked
+LeadPartBank	char(30)	Checked
+MTPartPct	numeric(9, 5)	Checked
+RateIndexChangeFreq	char(10)	Checked
+TaxFreeFlag	char(1)	Checked
+PrimaryRepayType	char(2)	Checked
+PrimaryCollType	char(5)	Checked
+RealEstateCollCode	char(5)	Checked
+RECollFlag	char(1)	Checked
+LoanSweepFlag	char(1)	Checked
+StmtApprovalDate	datetime	Checked
+EstMaturityDate	datetime	Checked
+ConstToPermDate	datetime	Checked
+DurationCode	char(1)	Checked
+CloseInd	char(1)	Checked
+AppraisalDate	datetime	Checked
+BatchID	char(4)	Checked
+PFCAmount	money	Checked
+SBALoanNumber	char(10)	Checked
+ProgramType	char(5)	Checked
+GuaranteedPct	numeric(9, 5)	Checked
+FedClass	char(5)	Checked
+AutoRenewDay	char(1)	Checked
+LastInspectionDate	datetime	Checked
+InspectionWaiveDate	datetime	Checked
+CurrentStmtDate	datetime	Checked
+FinancialStmtDate	datetime	Checked
+CIFRefNumber	char(17)	Checked
+ConversionCode	char(5)	Checked
+PD_Source_Obligor	char(1)	Checked
+PD_Date_Obligor	datetime	Checked
+PD_Source_Obligation	char(1)	Checked
+PD_Date_Obligation	datetime	Checked
+PD_Grade_Obligor	tinyint	Checked
+BillingScheduleEffectiveFromDate	datetime	Checked
+BillingScheduleEffectiveToDate	datetime	Checked
+BillingScheduleAmountDue	money	Checked
+BillingScheduleChargeCode	char(3)	Checked
+AcrualScheduleBasis	char(1)	Checked
+ChargeOffAmount	money	Checked
+ChargeOffRecovery	char(1)	Checked
+StatusCode	char(1)	Checked
+FrozenStatus	char(1)	Checked
+PrepaymentPrem	char(1)	Checked
+ACHAccountNumber	char(17)	Checked
+ACHTransitNumber	char(9)	Checked
+OriginalObligationDate	datetime	Checked
+PostedDate	datetime	Checked
+PastDueDays	int	Checked
+BankRepresentationOfaLoan	char(1)	Checked
+LGDSource	char(1)	Checked
+LGDDate	datetime	Checked
+LGDScorecardRef	char(8)	Checked
+PDObligorScorecardRef	char(8)	Checked
+PDObligationScorecardRef	char(8)	Checked
+LLType	tinyint	Checked
+LLDescription	char(40)	Checked
+HVCRE	char(2)	Checked
+TaxExemptQual	char(5)	Checked
