@@ -1,100 +1,102 @@
-AcctSystem	char(4)	Unchecked
-Bank	int	Unchecked
-AccountNumber	char(25)	Unchecked
-CustomerNumber	char(10)	Checked
-BookBalance	money	Checked
-UnusedBalance	money	Checked
-CommitmentBalance	money	Checked
-CurrentBalance	money	Checked
-AvailableBalance	money	Checked
-UserBalance	money	Checked
-PurposeCode	char(4)	Checked
-TakendownAmt	money	Checked
-OccupancyCode	char(1)	Checked
-REG_UZ	char(5)	Checked
-CustomerType	smallint	Checked
-CustomerTypeDesc	char(50)	Checked
-ObligationType	char(3)	Checked
-RateIndexCode	char(5)	Checked
-IndLiabilityAmt	money	Checked
-InterestRate	numeric(9, 5)	Checked
-CloseFlag	char(1)	Checked
-AssignUnit	char(5)	Checked
-EffectiveDate	datetime	Checked
-MaturityDate	datetime	Checked
-OriginalBalance	money	Checked
-Tier1Tier2Indicator	char(1)	Checked
-LastActivityDate	datetime	Checked
-AvgBalMTD	money	Checked
-CommitmentFee	money	Checked
-UnusedLineFee	money	Checked
-NumTakedowns	smallint	Checked
-ProcessType	char(4)	Checked
-BlockedLCAmt	money	Checked
-NumLettersOfCredit	smallint	Checked
-Margin	numeric(9, 5)	Checked
-CostOfFunds	char(15)	Checked
-Amortization	numeric(9, 5)	Checked
-AmortType	char(1)	Checked
-ServiceUnit	char(5)	Checked
-PDGradeObligation	tinyint	Checked
-NonAFSAccount	char(15)	Checked
-ParticipationType	char(3)	Checked
-LeadPartBank	char(30)	Checked
-MTPartPct	numeric(9, 5)	Checked
-RateIndexChangeFreq	char(10)	Checked
-TaxFreeFlag	char(1)	Checked
-PrimaryRepayType	char(2)	Checked
-PrimaryCollType	char(5)	Checked
-RealEstateCollCode	char(5)	Checked
-RECollFlag	char(1)	Checked
-LoanSweepFlag	char(1)	Checked
-StmtApprovalDate	datetime	Checked
-EstMaturityDate	datetime	Checked
-ConstToPermDate	datetime	Checked
-DurationCode	char(1)	Checked
-CloseInd	char(1)	Checked
-AppraisalDate	datetime	Checked
-BatchID	char(4)	Checked
-PFCAmount	money	Checked
-SBALoanNumber	char(10)	Checked
-ProgramType	char(5)	Checked
-GuaranteedPct	numeric(9, 5)	Checked
-FedClass	char(5)	Checked
-AutoRenewDay	char(1)	Checked
-LastInspectionDate	datetime	Checked
-InspectionWaiveDate	datetime	Checked
-CurrentStmtDate	datetime	Checked
-FinancialStmtDate	datetime	Checked
-CIFRefNumber	char(17)	Checked
-ConversionCode	char(5)	Checked
-PD_Source_Obligor	char(1)	Checked
-PD_Date_Obligor	datetime	Checked
-PD_Source_Obligation	char(1)	Checked
-PD_Date_Obligation	datetime	Checked
-PD_Grade_Obligor	tinyint	Checked
-BillingScheduleEffectiveFromDate	datetime	Checked
-BillingScheduleEffectiveToDate	datetime	Checked
-BillingScheduleAmountDue	money	Checked
-BillingScheduleChargeCode	char(3)	Checked
-AcrualScheduleBasis	char(1)	Checked
-ChargeOffAmount	money	Checked
-ChargeOffRecovery	char(1)	Checked
-StatusCode	char(1)	Checked
-FrozenStatus	char(1)	Checked
-PrepaymentPrem	char(1)	Checked
-ACHAccountNumber	char(17)	Checked
-ACHTransitNumber	char(9)	Checked
-OriginalObligationDate	datetime	Checked
-PostedDate	datetime	Checked
-PastDueDays	int	Checked
-BankRepresentationOfaLoan	char(1)	Checked
-LGDSource	char(1)	Checked
-LGDDate	datetime	Checked
-LGDScorecardRef	char(8)	Checked
-PDObligorScorecardRef	char(8)	Checked
-PDObligationScorecardRef	char(8)	Checked
-LLType	tinyint	Checked
-LLDescription	char(40)	Checked
-HVCRE	char(2)	Checked
-TaxExemptQual	char(5)	Checked
+CREATE TABLE YourTableName (
+    AcctSystem char(4) NOT NULL,
+    Bank int NOT NULL,
+    AccountNumber char(25) NOT NULL,
+    CustomerNumber char(10) NULL,
+    BookBalance money NULL,
+    UnusedBalance money NULL,
+    CommitmentBalance money NULL,
+    CurrentBalance money NULL,
+    AvailableBalance money NULL,
+    UserBalance money NULL,
+    PurposeCode char(4) NULL,
+    TakendownAmt money NULL,
+    OccupancyCode char(1) NULL,
+    REG_UZ char(5) NULL,
+    CustomerType smallint NULL,
+    CustomerTypeDesc char(50) NULL,
+    ObligationType char(3) NULL,
+    RateIndexCode char(5) NULL,
+    IndLiabilityAmt money NULL,
+    InterestRate numeric(9, 5) NULL,
+    CloseFlag char(1) NULL,
+    AssignUnit char(5) NULL,
+    EffectiveDate datetime NULL,
+    MaturityDate datetime NULL,
+    OriginalBalance money NULL,
+    Tier1Tier2Indicator char(1) NULL,
+    LastActivityDate datetime NULL,
+    AvgBalMTD money NULL,
+    CommitmentFee money NULL,
+    UnusedLineFee money NULL,
+    NumTakedowns smallint NULL,
+    ProcessType char(4) NULL,
+    BlockedLCAmt money NULL,
+    NumLettersOfCredit smallint NULL,
+    Margin numeric(9, 5) NULL,
+    CostOfFunds char(15) NULL,
+    Amortization numeric(9, 5) NULL,
+    AmortType char(1) NULL,
+    ServiceUnit char(5) NULL,
+    PDGradeObligation tinyint NULL,
+    NonAFSAccount char(15) NULL,
+    ParticipationType char(3) NULL,
+    LeadPartBank char(30) NULL,
+    MTPartPct numeric(9, 5) NULL,
+    RateIndexChangeFreq char(10) NULL,
+    TaxFreeFlag char(1) NULL,
+    PrimaryRepayType char(2) NULL,
+    PrimaryCollType char(5) NULL,
+    RealEstateCollCode char(5) NULL,
+    RECollFlag char(1) NULL,
+    LoanSweepFlag char(1) NULL,
+    StmtApprovalDate datetime NULL,
+    EstMaturityDate datetime NULL,
+    ConstToPermDate datetime NULL,
+    DurationCode char(1) NULL,
+    CloseInd char(1) NULL,
+    AppraisalDate datetime NULL,
+    BatchID char(4) NULL,
+    PFCAmount money NULL,
+    SBALoanNumber char(10) NULL,
+    ProgramType char(5) NULL,
+    GuaranteedPct numeric(9, 5) NULL,
+    FedClass char(5) NULL,
+    AutoRenewDay char(1) NULL,
+    LastInspectionDate datetime NULL,
+    InspectionWaiveDate datetime NULL,
+    CurrentStmtDate datetime NULL,
+    FinancialStmtDate datetime NULL,
+    CIFRefNumber char(17) NULL,
+    ConversionCode char(5) NULL,
+    PD_Source_Obligor char(1) NULL,
+    PD_Date_Obligor datetime NULL,
+    PD_Source_Obligation char(1) NULL,
+    PD_Date_Obligation datetime NULL,
+    PD_Grade_Obligor tinyint NULL,
+    BillingScheduleEffectiveFromDate datetime NULL,
+    BillingScheduleEffectiveToDate datetime NULL,
+    BillingScheduleAmountDue money NULL,
+    BillingScheduleChargeCode char(3) NULL,
+    AcrualScheduleBasis char(1) NULL,
+    ChargeOffAmount money NULL,
+    ChargeOffRecovery char(1) NULL,
+    StatusCode char(1) NULL,
+    FrozenStatus char(1) NULL,
+    PrepaymentPrem char(1) NULL,
+    ACHAccountNumber char(17) NULL,
+    ACHTransitNumber char(9) NULL,
+    OriginalObligationDate datetime NULL,
+    PostedDate datetime NULL,
+    PastDueDays int NULL,
+    BankRepresentationOfaLoan char(1) NULL,
+    LGDSource char(1) NULL,
+    LGDDate datetime NULL,
+    LGDScorecardRef char(8) NULL,
+    PDObligorScorecardRef char(8) NULL,
+    PDObligationScorecardRef char(8) NULL,
+    LLType tinyint NULL,
+    LLDescription char(40) NULL,
+    HVCRE char(2) NULL,
+    TaxExemptQual char(5) NULL
+);
