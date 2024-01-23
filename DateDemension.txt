@@ -1,32 +1,36 @@
-WITH RankedDates AS (
+WITH DateDiffs AS (
     SELECT 
-        A,
-        B,
-        [Date],
-        ROW_NUMBER() OVER (ORDER BY [Date]) - 
-        ROW_NUMBER() OVER (PARTITION BY A, B ORDER BY [Date]) AS GroupID
+        A, B, [Date],
+        LAG([Date]) OVER (PARTITION BY A, B ORDER BY [Date]) AS PrevDate
     FROM 
         YourTable
 ),
-GroupedDates AS (
+Groups AS (
     SELECT 
-        A,
-        B,
-        MIN([Date]) AS StartDate,
-        MAX([Date]) AS EndDate
+        A, B, [Date],
+        CASE 
+            WHEN DATEDIFF(day, PrevDate, [Date]) = 1 THEN 0
+            ELSE 1
+        END AS NewGroup
     FROM 
-        RankedDates
-    GROUP BY 
-        A, B, GroupID
+        DateDiffs
+),
+Grouped AS (
+    SELECT 
+        A, B, [Date],
+        SUM(NewGroup) OVER (ORDER BY A, B, [Date]) AS GroupID
+    FROM 
+        Groups
 )
 SELECT 
-    A,
-    B,
-    StartDate,
-    EndDate
+    A, B,
+    MIN([Date]) AS StartDate,
+    MAX([Date]) AS EndDate
 FROM 
-    GroupedDates
-WHERE 
-    DATEDIFF(day, StartDate, EndDate) >= 1
+    Grouped
+GROUP BY 
+    A, B, GroupID
+HAVING 
+    COUNT(*) > 1
 ORDER BY 
-    StartDate, A, B;
+    A, B, StartDate;
