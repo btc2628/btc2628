@@ -1,0 +1,92 @@
+import sys
+import pandas as pd
+import numpy as np
+import xgboost as xgb
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.model_selection import train_test_split, RandomizedSearchCV, KFold
+from sklearn.metrics import mean_squared_error, accuracy_score
+from sklearn.pipeline import Pipeline
+from scipy.stats import randint, uniform
+
+
+df_train = pd.read_csv('data/train.csv')
+df_predict = pd.read_csv('data/test.csv')
+
+df_X = df_train.drop('Survived', axis=1)
+y = df_train['Survived'].values
+
+df_X.drop(columns=['Cabin', 'Name', 'Ticket'], inplace=True)
+
+df_X['Sex'] = df_X['Sex'].replace({'male':1, 'female':0})
+
+dummies = pd.get_dummies(df_X['Embarked'], drop_first=True)
+
+df_X = df_X.drop('Embarked', axis=1)
+
+df_X = pd.concat([df_X, dummies], axis=1)
+
+med_impute = SimpleImputer(strategy='median')
+
+ages = df_X['Age'].values.reshape(-1, 1)
+
+med_impute.fit(ages)
+
+df_X['Age'] = med_impute.transform(ages)
+
+print(df_X.isnull().sum())
+
+X = df_X.values
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2, random_state=420, stratify=y)
+
+param_dist = {
+    'n_estimators': randint(100, 500),
+    'max_features': ['auto', 'sqrt', 'log2'],
+    'max_depth': randint(10, 50),
+    'min_samples_split': randint(2, 11),
+    'min_samples_leaf': randint(1, 5),
+    'bootstrap': [True, False]
+}
+
+rf = RandomForestClassifier()
+
+kf = KFold(n_splits=5, shuffle=True, random_state=420)
+
+rand_search = RandomizedSearchCV(estimator=rf, param_distributions=param_dist, cv=kf, n_iter=1, n_jobs=-1, verbose=2, random_state=420)
+
+rand_search.fit(X_train, y_train)
+
+print("Best Parameters Found: ", rand_search.best_params_)
+print("Best score Found: ", rand_search.best_score_)
+
+
+
+
+'''
+scaler = StandardScaler()
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2, random_state=420, stratify=y)
+
+X_train = scaler.fit_transform(X_train)
+
+X_test = scaler.transform(X_test)
+
+pipelines = {'Random Forest': Pipeline([('model', RandomForestClassifier())]),
+'decision_tree': Pipeline([('model', xgb.XGBClassifier(use_label_encoder=False, eval_metric='logloss'))]),
+'logistic_regression': Pipeline([('model', LogisticRegression())])}
+
+results = {}
+
+for name, pipeline in pipelines.items():
+    pipeline.fit(X_train, y_train)
+    predictions = pipeline.predict(X_test)
+
+    score = accuracy_score(y_test, predictions)
+    results[name] = score
+
+for model, s in results.items():
+    print(str(model) + 'score is: ' + str(s))
+'''
