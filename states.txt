@@ -1,0 +1,41 @@
+import pandas as pd
+from geotext import GeoText
+import re
+
+# Assuming df is your DataFrame and it has a column named 'text'
+
+# List of US states and their abbreviations
+states_and_abbr = {
+    'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 
+    'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA', 
+    'Hawaii': 'HI', 'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA', 
+    'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA', 'Maine': 'ME', 'Maryland': 'MD', 
+    'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO', 
+    'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ', 
+    'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH', 
+    'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC', 
+    'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT', 
+    'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
+}
+
+# Function to preprocess text and match state names/abbreviations
+def preprocess_and_match(text):
+    # Normalize text for better matching, e.g., lowercasing
+    text_lower = text.lower()
+    
+    # Check for cities using GeoText
+    places = GeoText(text)
+    has_city = len(places.cities) > 0
+    
+    # Create patterns for state names and abbreviations
+    state_name_pattern = r'\b(?:' + '|'.join([re.escape(state.lower()) for state in states_and_abbr.keys()]) + r')\b'
+    state_abbr_pattern = r'\b(?:' + '|'.join([re.escape(abbr.lower()) for abbr in states_and_abbr.values()]) + r')\b'
+    
+    # Search for state names or abbreviations in the text
+    has_state_name = re.search(state_name_pattern, text_lower) is not None
+    has_state_abbr = re.search(state_abbr_pattern, text_lower) is not None
+    
+    return int(has_city or has_state_name or has_state_abbr)
+
+# Apply the function to each row in the 'text' column to create the 'location' column
+df['location'] = df['text'].apply(preprocess_and_match)
