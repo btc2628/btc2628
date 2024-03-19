@@ -1,0 +1,28 @@
+from sklearn.model_selection import RandomizedSearchCV, KFold
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from scipy.stats import uniform
+
+# Define the model and the pipeline
+logistic_regression = LogisticRegression(solver='saga', max_iter=1000)
+pipeline = Pipeline(steps=[('scale', StandardScaler()), ('model', logistic_regression)])
+
+# Define the parameter space for RandomizedSearch
+param_distributions = {
+    'model__C': uniform(loc=0, scale=4),  # Regularization strength
+    'model__penalty': ['l2', 'none']  # Penalties (l1 penalties might require a different solver)
+}
+
+# Define the KFold cross-validator
+kfold = KFold(n_splits=5, shuffle=True, random_state=42)
+
+# Setup the RandomizedSearchCV
+random_search = RandomizedSearchCV(pipeline, param_distributions=param_distributions, n_iter=100, cv=kfold, verbose=1, random_state=42, n_jobs=-1)
+
+# Fit the RandomizedSearchCV to find the best model
+random_search.fit(X, Y)
+
+# Best model after Randomized Search
+print("Best parameters found: ", random_search.best_params_)
+print("Best score: ", random_search.best_score_)
