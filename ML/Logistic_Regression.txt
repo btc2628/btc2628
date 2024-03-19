@@ -5,13 +5,13 @@ from sklearn.pipeline import Pipeline
 from scipy.stats import uniform
 
 # Define the model and the pipeline
-logistic_regression = LogisticRegression(solver='saga', max_iter=1000)
-pipeline = Pipeline(steps=[('scale', StandardScaler()), ('model', logistic_regression)])
+pipeline = Pipeline(steps=[('scale', StandardScaler()), ('model', LogisticRegression(max_iter=1000))])
 
-# Define the parameter space for RandomizedSearch
+# Define the parameter space for RandomizedSearch, including solvers
 param_distributions = {
     'model__C': uniform(loc=0, scale=4),  # Regularization strength
-    'model__penalty': ['l2', 'none']  # Penalties (l1 penalties might require a different solver)
+    'model__penalty': ['l1', 'l2', 'none'],  # Penalties
+    'model__solver': ['saga', 'liblinear']  # Solvers compatible with l1 penalty
 }
 
 # Define the KFold cross-validator
