@@ -23,3 +23,22 @@ random_search.fit(X, Y)
 # Best model after Randomized Search
 print("Best parameters found: ", random_search.best_params_)
 print("Best score: ", random_search.best_score_)
+
+best_model = random_search.best_estimator_.named_steps['model']
+
+# Get feature names directly from the DataFrame
+feature_names = np.array(X.columns)  # Extracting feature names
+
+# Get the coefficients from the best model
+coefficients = best_model.coef_[0]
+
+# Plotting
+plt.figure(figsize=(10, 8))
+indices = np.argsort(np.abs(coefficients))[::-1]  # Sort features by importance
+plt.barh(range(len(indices)), coefficients[indices], color='b', align='center')
+plt.yticks(range(len(indices)), feature_names[indices])
+plt.xlabel('Coefficient Value')
+plt.title('Feature Importance - Logistic Regression')
+plt.gca().invert_yaxis()  # Invert y-axis to have the most important at the top
+plt.show()
+
