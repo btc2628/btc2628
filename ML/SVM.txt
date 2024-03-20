@@ -1,0 +1,65 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.svm import SVC
+from sklearn.model_selection import RandomizedSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from scipy.stats import loguniform
+from sklearn.inspection import permutation_importance
+from joblib import dump
+import os
+
+# Setup the pipeline
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('svm', SVC(probability=True, random_state=42))
+])
+
+# Define the parameter space for RandomizedSearch
+param_distributions = {
+    'svm__C': loguniform(1e-3, 1e3),  # Regularization parameter
+    'svm__kernel': ['linear', 'rbf', 'poly'],  # Kernel type
+    'svm__gamma': loguniform(1e-4, 1e1),  # Kernel coefficient for 'rbf', 'poly' and 'sigmoid'
+    # 'svm__degree': randint(1, 5),  # Degree for 'poly' kernel, uncomment if you want to explore polynomial kernels deeply
+}
+
+# Define RandomizedSearchCV
+random_search = RandomizedSearchCV(
+    pipeline,
+    param_distributions=param_distributions,
+    n_iter=100,  # Increase or decrease based on computational budget
+    cv=5,
+    verbose=2,
+    random_state=42,
+    n_jobs=-1
+)
+
+# Fit RandomizedSearchCV
+random_search.fit(X, y)
+
+# Ensure the directory exists
+os.makedirs('Trained_Models', exist_ok=True)
+
+# Save the best model
+dump(random_search.best_estimator_, 'Trained_Models/svm_model.joblib')
+
+if random_search.best_estimator_.named_steps['svm'].kernel == 'linear':
+    # For linear kernels, we can use the model's coefficients
+    coefs = random_search.best_estimator_.named_steps['svm'].coef_[0]
+    indices = np.argsort(np.abs(coefs))[::-1]
+
+    plt.figure(figsize=(10, 6))
+    plt.title("Feature importances (Linear SVM)")
+    plt.bar(range(X.shape[1]), coefs[indices], align="center")
+    plt.xticks(range(X.shape[1]), indices)
+    plt.xlim([-1, X.shape[1]])
+    plt.show()
+
+else:
+    result = permutation_importance(random_search.best_estimator_, X, y, n_repeats=10, random_state=42, n_jobs=-1)
+    sorted_idx = result.importances_mean.argsort()
+
+    plt.figure(figsize=(10, 6))
+    plt.boxplot(result.importances[sorted_idx].T, vert=False, labels=range(X.shape[1]))
+    plt.title("Permutation Importance (non-linear SVM)")
+    plt.show()
