@@ -1,0 +1,23 @@
+import pandas as pd
+import tensorflow as tf
+from transformers import BertTokenizer, TFBertForSequenceClassification
+
+# Load the model and tokenizer
+model_path = 'path/to/your/model'
+model = TFBertForSequenceClassification.from_pretrained(model_path, num_labels=3)
+tokenizer = BertTokenizer.from_pretrained(model_path)
+
+def predict(text):
+    inputs = tokenizer(text, return_tensors="tf")
+    outputs = model(inputs)
+    logits = outputs.logits
+    probabilities = tf.nn.softmax(logits, axis=-1)
+    return tf.argmax(probabilities, axis=-1).numpy()[0]
+
+# Assuming df is your DataFrame and it has a column 'text' that contains the text you want to classify
+# df = pd.read_csv('your_file.csv') # Example of loading your DataFrame
+
+# Apply the prediction function to each row in the DataFrame
+df['predicted_class'] = df['text'].apply(predict)
+
+print(df[['text', 'predicted_class']])
