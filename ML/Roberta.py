@@ -7,6 +7,9 @@ import time
 
 start_time = time.time()
 
+tf.config.threading.set_intra_op_parallelism_threads(1)
+tf.config.threading.set_inter_op_parallelism_threads(1)
+
 
 data_file = 'Data/train_data.xlsx'
 df = pd.read_excel(data_file)
