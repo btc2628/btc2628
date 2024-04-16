@@ -11,7 +11,6 @@ start_time = time.time()
 data_file = 'Data/train_data.xlsx'
 df = pd.read_excel(data_file)
 
-#df['Text'] = df.apply(lambda row: f"Subject: {row['subject_desc']}\nPurpose: {row['purpose_text']}\nBody: {row['body']}", axis=1)
 
 df['Label'] = df['grade'] - 1
 
