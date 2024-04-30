@@ -1,36 +1,5 @@
-WITH DateDiffs AS (
-    SELECT 
-        A, B, [Date],
-        LAG([Date]) OVER (PARTITION BY A, B ORDER BY [Date]) AS PrevDate
-    FROM 
-        YourTable
-),
-Groups AS (
-    SELECT 
-        A, B, [Date],
-        CASE 
-            WHEN DATEDIFF(day, PrevDate, [Date]) = 1 THEN 0
-            ELSE 1
-        END AS NewGroup
-    FROM 
-        DateDiffs
-),
-Grouped AS (
-    SELECT 
-        A, B, [Date],
-        SUM(NewGroup) OVER (ORDER BY A, B, [Date]) AS GroupID
-    FROM 
-        Groups
-)
-SELECT 
-    A, B,
-    MIN([Date]) AS StartDate,
-    MAX([Date]) AS EndDate
-FROM 
-    Grouped
-GROUP BY 
-    A, B, GroupID
-HAVING 
-    COUNT(*) > 1
-ORDER BY 
-    A, B, StartDate;
+	DECLARE @date as DATE = '2024-04-30'
+
+declare @weekEndDate as date = CASE WHEN DATEPART(WEEKDAY, @date) < 5 THEN DATEADD(DAY, -1 - DATEPART(WEEKDAY, @date), CAST(@date as DATE))
+									WHEN DATEPART(WEEKDAY, @date) > 5 THEN DATEADD(DAY, -1 - DATEPART(WEEKDAY, @date), CAST(@date as DATE))
+									ELSE DATEADD(DAY, 7, CAST(@date as DATE))
