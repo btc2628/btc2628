@@ -1,0 +1,44 @@
+import os
+import torch
+from transformers import AutoConfig, AutoModel
+
+def load_sharded_model(shard_paths):
+    state_dict = {}
+    for shard_path in shard_paths:
+        shard = torch.load(shard_path)
+        state_dict.update(shard)
+    return state_dict
+
+# Paths to sharded model parts
+shard_paths = [
+    'path/to/model-00001-of-00004.safetensors',
+    'path/to/model-00002-of-00004.safetensors',
+    'path/to/model-00003-of-00004.safetensors',
+    'path/to/model-00004-of-00004.safetensors'
+]
+
+# Load the combined state dictionary
+model_state_dict = load_sharded_model(shard_paths)
+
+# Load the config and initialize the model
+config_path = 'path/to/config.json'
+config = AutoConfig.from_pretrained(config_path)
+model = AutoModel.from_config(config)
+model.load_state_dict(model_state_dict)
+
+# Directory for saving the model
+model_dir = 'llamas'
+if not os.path.exists(model_dir):
+    os.makedirs(model_dir)
+
+# Save model and config
+model_path = os.path.join(model_dir, 'pytorch_model.bin')
+torch.save(model.state_dict(), model_path)
+config_path = os.path.join(model_dir, 'config.json')
+with open(config_path, 'w') as f:
+    f.write(config.to_json_string())
+
+# Assuming you have a tokenizer to save
+# from transformers import PreTrainedTokenizerFast
+# tokenizer = PreTrainedTokenizerFast(tokenizer_file='path/to/tokenizer.json')
+# tokenizer.save_pretrained(model_dir)
