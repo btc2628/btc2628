@@ -1,0 +1,56 @@
+import pandas as pd
+from catboost import CatBoostRegressor
+from sklearn.model_selection import RandomizedSearchCV, KFold, train_test_split
+from sklearn.metrics import make_scorer, mean_squared_error
+import numpy as np
+
+# Assume df is your DataFrame for training
+X = df.drop('label', axis=1)
+y = df['label']
+
+# Assume df_validation is your separate validation DataFrame
+X_val = df_validation.drop('label', axis=1)
+y_val = df_validation['label']
+
+# Identify indices of categorical features
+categorical_features_indices = [i for i in range(len(X.columns)) if X.dtypes[i] == 'object']
+
+# CatBoost accepts categorical indices directly
+model = CatBoostRegressor(cat_features=categorical_features_indices, verbose=0)
+
+# Parameter grid for RandomizedSearch
+param_grid = {
+    'iterations': [100, 500, 1000],
+    'depth': [4, 6, 10],
+    'learning_rate': [0.01, 0.05, 0.1],
+    'l2_leaf_reg': [1, 3, 5, 7]
+}
+
+# Custom scorer for RMSE
+rmse_scorer = make_scorer(mean_squared_error, greater_is_better=False, squared=False)
+
+# Setup cross-validation method
+kfold = KFold(n_splits=5, shuffle=True, random_state=42)
+
+# Setup the random search with 4-fold cross-validation
+random_search = RandomizedSearchCV(
+    estimator=model,
+    param_distributions=param_grid,
+    n_iter=10,  # Number of parameter settings that are sampled
+    scoring=rmse_scorer,
+    cv=kfold,
+    random_state=42
+)
+
+# Fit RandomizedSearchCV to data
+random_search.fit(X, y)
+
+# Best model result
+best_model = random_search.best_estimator_
+print(f"Best parameters: {random_search.best_params_}")
+print(f"Best RMSE: {random_search.best_score_}")
+
+# Evaluate on validation set
+predictions_val = best_model.predict(X_val)
+rmse_validation = np.sqrt(mean_squared_error(y_val, predictions_val))
+print(f"Validation RMSE: {rmse_validation}")
