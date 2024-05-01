@@ -1,35 +1,19 @@
-from llmanlp.models import LlamaForSequenceClassification
-from safetensors.torch import load, save
 import torch
 
-# Paths to your SafetyTensors model parts
-model_parts = [
-    './path_to_safety_tensors/model-00001-of-00004.safetensors',
-    './path_to_safety_tensors/model-00002-of-00004.safetensors',
-    './path_to_safety_tensors/model-00003-of-00004.safetensors',
-    './path_to_safety_tensors/model-00004-of-00004.safetensors'
-]
+# Assuming 'LLaMA3Model' is the model class for LLaMA 3 8B
+model = LLaMA3Model()
 
-# Load and concatenate the model parts
-model_weights = None
-for part in model_parts:
-    part_data = load(part)['obj']  # Assuming the model data is stored under 'obj'
-    if model_weights is None:
-        model_weights = part_data
-    else:
-        model_weights = torch.cat((model_weights, part_data), 0)  # Adjust dimension if necessary
+# Load the model weights
+model.load_state_dict(torch.load('path_to_consolidated.00.pth'))
 
-# Load the configuration
-config_path = './path_to_safety_tensors/config.json'
-with open(config_path, 'r') as file:
-    config = json.load(file)
+# Set the model to evaluation mode if not training
+model.eval()
 
-# Initialize the model with the loaded configuration and concatenated weights
-model = LlamaForSequenceClassification(config=config)
-model.load_state_dict(model_weights, strict=False)  # Use strict=False if the weights need adjustments
+# Save the model state dictionary (recommended)
+torch.save(model.state_dict(), 'model_weights.pth')
 
-# Save the complete model to a local directory
-save_directory = './my_local_directory/llama_for_sequence_classification'
-model.save_pretrained(save_directory)
+# Optionally, save the entire model (includes architecture)
+torch.save(model, 'complete_model.pth')
 
-print(f"Complete model loaded and saved in {save_directory}")
+# Check your directory to make sure the files are saved
+print("Model files saved: model_weights.pth, complete_model.pth")
