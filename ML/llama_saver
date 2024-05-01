@@ -1,44 +1,35 @@
-import os
+from llmanlp.models import LlamaForSequenceClassification
+from safetensors.torch import load, save
 import torch
-from transformers import AutoConfig, AutoModel
 
-def load_sharded_model(shard_paths):
-    state_dict = {}
-    for shard_path in shard_paths:
-        shard = torch.load(shard_path)
-        state_dict.update(shard)
-    return state_dict
-
-# Paths to sharded model parts
-shard_paths = [
-    'path/to/model-00001-of-00004.safetensors',
-    'path/to/model-00002-of-00004.safetensors',
-    'path/to/model-00003-of-00004.safetensors',
-    'path/to/model-00004-of-00004.safetensors'
+# Paths to your SafetyTensors model parts
+model_parts = [
+    './path_to_safety_tensors/model-00001-of-00004.safetensors',
+    './path_to_safety_tensors/model-00002-of-00004.safetensors',
+    './path_to_safety_tensors/model-00003-of-00004.safetensors',
+    './path_to_safety_tensors/model-00004-of-00004.safetensors'
 ]
 
-# Load the combined state dictionary
-model_state_dict = load_sharded_model(shard_paths)
+# Load and concatenate the model parts
+model_weights = None
+for part in model_parts:
+    part_data = load(part)['obj']  # Assuming the model data is stored under 'obj'
+    if model_weights is None:
+        model_weights = part_data
+    else:
+        model_weights = torch.cat((model_weights, part_data), 0)  # Adjust dimension if necessary
 
-# Load the config and initialize the model
-config_path = 'path/to/config.json'
-config = AutoConfig.from_pretrained(config_path)
-model = AutoModel.from_config(config)
-model.load_state_dict(model_state_dict)
+# Load the configuration
+config_path = './path_to_safety_tensors/config.json'
+with open(config_path, 'r') as file:
+    config = json.load(file)
 
-# Directory for saving the model
-model_dir = 'llamas'
-if not os.path.exists(model_dir):
-    os.makedirs(model_dir)
+# Initialize the model with the loaded configuration and concatenated weights
+model = LlamaForSequenceClassification(config=config)
+model.load_state_dict(model_weights, strict=False)  # Use strict=False if the weights need adjustments
 
-# Save model and config
-model_path = os.path.join(model_dir, 'pytorch_model.bin')
-torch.save(model.state_dict(), model_path)
-config_path = os.path.join(model_dir, 'config.json')
-with open(config_path, 'w') as f:
-    f.write(config.to_json_string())
+# Save the complete model to a local directory
+save_directory = './my_local_directory/llama_for_sequence_classification'
+model.save_pretrained(save_directory)
 
-# Assuming you have a tokenizer to save
-# from transformers import PreTrainedTokenizerFast
-# tokenizer = PreTrainedTokenizerFast(tokenizer_file='path/to/tokenizer.json')
-# tokenizer.save_pretrained(model_dir)
+print(f"Complete model loaded and saved in {save_directory}")
