@@ -1,5 +1,1 @@
-	DECLARE @date as DATE = '2024-04-30'
-
-declare @weekEndDate as date = CASE WHEN DATEPART(WEEKDAY, @date) < 5 THEN DATEADD(DAY, -1 - DATEPART(WEEKDAY, @date), CAST(@date as DATE))
-									WHEN DATEPART(WEEKDAY, @date) > 5 THEN DATEADD(DAY, -1 - DATEPART(WEEKDAY, @date), CAST(@date as DATE))
-									ELSE DATEADD(DAY, 7, CAST(@date as DATE))
+=TRIM(RIGHT(E2,LEN(E2)-FIND("@",SUBSTITUTE(E2," ","@",LEN(E2)-LEN(SUBSTITUTE(E2," ","")))))) & " " & TRIM(LEFT(E2,FIND("@",SUBSTITUTE(E2," ","@",LEN(E2)-LEN(SUBSTITUTE(E2," ",""))))-1))
