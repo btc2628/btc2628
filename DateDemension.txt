@@ -1,1 +1,33 @@
-=TRIM(RIGHT(E2,LEN(E2)-FIND("@",SUBSTITUTE(E2," ","@",LEN(E2)-LEN(SUBSTITUTE(E2," ","")))))) & " " & TRIM(LEFT(E2,FIND("@",SUBSTITUTE(E2," ","@",LEN(E2)-LEN(SUBSTITUTE(E2," ",""))))-1))
+-- Identify duplicate IDs
+WITH DuplicateIDs AS (
+    SELECT ID
+    FROM YourTable
+    GROUP BY ID
+    HAVING COUNT(*) > 1
+),
+-- Apply the rules to select the correct value for each column
+CTE AS (
+    SELECT
+        ID,
+        CASE 
+            WHEN COUNT(DISTINCT Column1) = 1 THEN MAX(Column1)
+            ELSE MAX(CASE WHEN Column1 IS NOT NULL AND Column1 <> 0 THEN Column1 ELSE 0 END)
+        END AS Column1,
+        CASE 
+            WHEN COUNT(DISTINCT Column2) = 1 THEN MAX(Column2)
+            ELSE MAX(CASE WHEN Column2 IS NOT NULL AND Column2 <> 0 THEN Column2 ELSE 0 END)
+        END AS Column2,
+        -- Add more columns as needed
+        COUNT(*) AS cnt
+    FROM YourTable
+    WHERE ID IN (SELECT ID FROM DuplicateIDs)
+    GROUP BY ID
+)
+-- Delete the original duplicate rows
+DELETE FROM YourTable
+WHERE ID IN (SELECT ID FROM CTE WHERE cnt > 1);
+
+-- Insert the cleaned rows back into the table
+INSERT INTO YourTable (ID, Column1, Column2)
+SELECT ID, Column1, Column2
+FROM CTE;
