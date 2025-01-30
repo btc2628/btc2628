@@ -1,4 +1,10 @@
 UPDATE People
-SET 
-    FIRSTNAME = UPPER(LEFT(FIRSTNAME, 1)) + LOWER(SUBSTRING(FIRSTNAME, 2, LEN(FIRSTNAME))),
-    LASTNAME = UPPER(LEFT(LASTNAME, 1)) + LOWER(SUBSTRING(LASTNAME, 2, LEN(LASTNAME)));
+SET FULLNAME = 
+    -- Capitalize the first letter of the first name
+    UPPER(LEFT(FULLNAME, 1)) + 
+    LOWER(SUBSTRING(FULLNAME, 2, CHARINDEX(' ', FULLNAME) - 1)) +
+    -- Add a space
+    ' ' +
+    -- Capitalize the first letter of the last name
+    UPPER(SUBSTRING(FULLNAME, CHARINDEX(' ', FULLNAME) + 1, 1)) +
+    LOWER(SUBSTRING(FULLNAME, CHARINDEX(' ', FULLNAME) + 2, LEN(FULLNAME)));
