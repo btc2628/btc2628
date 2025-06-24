@@ -1,10 +1,5 @@
-UPDATE People
-SET FULLNAME = 
-    -- Capitalize the first letter of the first name
-    UPPER(LEFT(FULLNAME, 1)) + 
-    LOWER(SUBSTRING(FULLNAME, 2, CHARINDEX(' ', FULLNAME) - 1)) +
-    -- Add a space
-    ' ' +
-    -- Capitalize the first letter of the last name
-    UPPER(SUBSTRING(FULLNAME, CHARINDEX(' ', FULLNAME) + 1, 1)) +
-    LOWER(SUBSTRING(FULLNAME, CHARINDEX(' ', FULLNAME) + 2, LEN(FULLNAME)));
+We can start off in the top left with relpro roi. The team has been unable to dedicate time to reporting on relpro investment ROI, however, in the mean time Frank has been doing an excellent job at manually taking care of the reporting for us. So thank you Frank, and we hope to be able to take this task off his plate soon.
+
+One major win in the past quarter has been client segmentation. Client segmentation has already become one of the top viewed reports in all of business banking and it has only been improving with enhancements such as improved industry and geography information and a soon to come executive summary. We have heard many success stories from RM's who have used the report to target high value customers including one instance where we were able to save a client over 250k annually in fees. Furthermore client segmentation is at the point in its lifecycle where it is now transitioning to BAU project requiring less development time and ongoing maintenance. 
+
+For another win we have our ongoing efforts to minimize reliance on ERM whenever possible, and to create accuracies from sources that previously provided inaccurate values. One part of this involves a review of all loan modifications to ensure that the new money paid out on is aligned with what we would expect it to be. Additionally call options were also improved with a longer term fix to ensure the appropriate term was passed from ERM to reporting thus ensuring calculation of correct liquidity premiums, in addition to the short term fix of correcting YTD call options.
